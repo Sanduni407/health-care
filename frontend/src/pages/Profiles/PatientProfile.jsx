@@ -183,6 +183,24 @@ export default function PatientProfile() {
               <ArrowRight className="w-6 h-6 text-teal-600 group-hover:translate-x-1 transition-transform" />
             </div>
           </button>
+
+          <button
+            onClick={() => navigate("/outstanding-bills")}
+            className="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-all border border-gray-100 hover:border-teal-500 text-left group"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-teal-600 transition-colors">
+                 View Outstanding Bills
+                </h3>
+                <p className="text-gray-600">
+                  View and manage payments
+                </p>
+              </div>
+              <ArrowRight className="w-6 h-6 text-teal-600 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </button>
+
         </div>
 
         {/* Health Tips Card */}
