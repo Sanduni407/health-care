@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { Calendar, Clock, User, Phone, FileText, CheckCircle, X } from "lucide-react";
+import { Calendar, Clock, User, Phone, FileText, CheckCircle, X, AlertCircle } from "lucide-react";
 import {
   getDoctorPublicProfile,
   getDoctorSlotsByDate,
@@ -21,7 +21,9 @@ export default function BookAppointment() {
   const [loading, setLoading] = useState(true);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false);
   const [error, setError] = useState(null);
+  const [errorDetails, setErrorDetails] = useState(null);
 
   const [form, setForm] = useState({
     patientName: user?.name || "",
@@ -64,6 +66,7 @@ export default function BookAppointment() {
   const handleSlotSelect = (slot) => {
     if (!slot.isBooked) {
       setSelectedSlot(slot);
+      setError(null); // Clear any previous errors
     }
   };
 
@@ -76,6 +79,7 @@ export default function BookAppointment() {
 
     setLoading(true);
     setError(null);
+    setShowError(false);
 
     try {
       const res = await bookAppointment({
@@ -90,13 +94,34 @@ export default function BookAppointment() {
           navigate("/my-appointments");
         }, 3000);
       } else {
+        // Booking failed - show error modal
         setError(res.message);
+        setErrorDetails({
+          selectedSlot: selectedSlot,
+          attemptedDate: selectedDate,
+          doctorName: doctor?.user?.name
+        });
+        setShowError(true);
+        setLoading(false);
       }
     } catch (err) {
-      setError(err.message);
-    } finally {
+      setError(err.message || "Failed to book appointment");
+      setErrorDetails({
+        selectedSlot: selectedSlot,
+        attemptedDate: selectedDate,
+        doctorName: doctor?.user?.name
+      });
+      setShowError(true);
       setLoading(false);
     }
+  };
+
+  const handleTryAgain = () => {
+    setShowError(false);
+    setError(null);
+    setErrorDetails(null);
+    setSelectedSlot(null);
+    fetchDoctorAndSlots(); // Refresh slots
   };
 
   if (loading && !doctor) {
@@ -110,6 +135,7 @@ export default function BookAppointment() {
     );
   }
 
+  // Success Modal
   if (showSuccess) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -135,6 +161,59 @@ export default function BookAppointment() {
             <p className="text-sm text-gray-600">
               Redirecting to your appointments...
             </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error Modal
+  if (showError) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="max-w-2xl mx-auto px-6 py-12">
+          <div className="bg-white rounded-lg shadow-lg p-12 text-center">
+            <AlertCircle className="w-20 h-20 text-red-500 mx-auto mb-6" />
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">
+              Appointment Booking Failed
+            </h2>
+            
+            {/* Error Message */}
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+              <p className="text-red-700 font-semibold mb-2">Reason:</p>
+              <p className="text-red-600">{error}</p>
+            </div>
+
+            {/* Attempted Booking Details */}
+            <div className="bg-gray-50 rounded-lg p-6 mb-6 text-left">
+              <p className="text-sm text-gray-600 mb-2">Attempted Booking:</p>
+              <p className="font-semibold text-gray-800">
+                Doctor: {errorDetails?.doctorName}
+              </p>
+              <p className="font-semibold text-gray-800">
+                Date: {new Date(errorDetails?.selectedSlot?.start).toLocaleDateString()}
+              </p>
+              <p className="font-semibold text-gray-800">
+                Time: {formatTime(errorDetails?.selectedSlot?.start)} - {formatTime(errorDetails?.selectedSlot?.end)}
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex space-x-4 justify-center">
+              <button
+                onClick={handleTryAgain}
+                className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-md hover:bg-teal-700 transition-colors"
+              >
+                Try Another Slot
+              </button>
+              <button
+                onClick={() => navigate("/my-appointments")}
+                className="px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-md hover:bg-gray-300 transition-colors"
+              >
+                View My Appointments
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -235,8 +314,9 @@ export default function BookAppointment() {
               </h2>
             </div>
 
-            {error && (
-              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            {error && !showError && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-2">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                 <p className="text-red-700 text-sm">{error}</p>
               </div>
             )}
