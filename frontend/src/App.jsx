@@ -14,6 +14,10 @@ import DoctorDetail from './pages/Appointments/DoctorDetail';
 import BookAppointment from './pages/Appointments/BookAppointment';
 import MyAppointments from './pages/Appointments/MyAppointments';
 import DoctorAvailability from './pages/Doctor/DoctorAvailability';
+import OutstandingBills from './pages/billPayment/OutstandingBills';
+import PaymentPage from './pages/billPayment/PaymentPage';
+import PaymentSuccess from './pages/billPayment/PaymentSuccess';
+
 
 const App = () => {
   return (
@@ -93,6 +97,9 @@ const App = () => {
             <DoctorAvailability />
           </ProtectedRoute>
         } />
+        <Route path="/outstanding-bills" element={<OutstandingBills />} />
+        <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
       </Routes>
     </div>
   )

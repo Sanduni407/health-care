@@ -1,5 +1,8 @@
 import Navbar from "../../components/Navbar/Navbar";
 import { Calendar, Clock, Shield, Heart, Activity, Stethoscope, Users, FileText } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
+
+
 
 export default function Home() {
   const features = [
@@ -32,6 +35,7 @@ export default function Home() {
     { icon: FileText, name: "Pharmacy", description: "Medicine services" },
     { icon: Stethoscope, name: "Emergency", description: "24/7 urgent care" }
   ];
+   const navigate = useNavigate();
 
   return (
     <>
@@ -40,6 +44,7 @@ export default function Home() {
       {/* Hero Section with Background Image */}
       <div className="relative overflow-hidden min-h-[600px]">
         {/* Background Image - No Overlay */}
+       
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{
@@ -200,6 +205,13 @@ export default function Home() {
             >
               Already a Member?
             </a>
+             <button 
+      onClick={() => navigate('/outstanding-bills')}
+      className="bg-blue-500 text-white px-6 py-3 rounded-lg"
+      
+    >
+      View Outstanding Bills
+    </button>
           </div>
         </div>
       </div>

@@ -8,6 +8,8 @@ import doctorRoutes from "./routes/doctorRoutes.js";
 import appointmentRoutes from "./routes/appointmentRoutes.js";
 import availabilityRoutes from "./routes/availabilityRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import billRoutes from "./routes/billRoutes.js";
+import stripeRoutes from "./routes/stripeRoutes.js";
 
 //app config
 const app = express()
@@ -26,6 +28,8 @@ app.use("/api/doctors", doctorRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/availability", availabilityRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/bills", billRoutes);
+app.use("/api/stripe", stripeRoutes);
 
 app.use("/uploads", express.static("uploads"));
 
