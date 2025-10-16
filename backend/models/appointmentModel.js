@@ -10,7 +10,7 @@ end: { type: Date, required: true },
 reason: { type: String },
 phone: { type: String },
 status: { type: String, enum: ['booked','cancelled','completed'], default: 'booked' },
-paymentStatus: { type: String, enum: ['pending','paid','refunded'], default: 'pending' },
+paymentStatus: { type: String, enum: ['pending','paid','refunded','cancelled'], default: 'pending' },
 createdAt: { type: Date, default: Date.now },
 cancelledAt: { type: Date }
 });
