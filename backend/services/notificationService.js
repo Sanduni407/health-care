@@ -32,13 +32,13 @@ export const notifyAffectedPatients = async (doctorId, date) => {
   const appointments = await Appointment.find({
     doctor: doctorId,
     start: { $gte: startOfDay, $lte: endOfDay },
-    status: 'booked'
+    status: 'cancelled'  //this has as booked
   }).populate('patient');
 
   // Create notifications for each affected patient
   for (const appointment of appointments) {
     await createAppointmentCancelledNotification(appointment, "doctor marked this date as unavailable");
-    await appointmentRepo.cancelAppointment(appointment._id);
+    //await appointmentRepo.cancelAppointment(appointment._id);
   }
 
   return appointments.length;
