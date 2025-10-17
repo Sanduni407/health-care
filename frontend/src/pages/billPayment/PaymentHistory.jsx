@@ -1,47 +1,45 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const PaymentHistory = () => {
+  const navigate = useNavigate();
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Mock data for demonstration - replace with actual API call
+  const API_URL = 'http://localhost:4000/api';
+
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      const mockPayments = [
-        {
-          _id: '67890abcdef12345',
-          transactionId: 'pi_3Abc123XYZ789',
-          paidAt: new Date('2025-10-15T14:30:00'),
-          patient: {
-            name: 'John Doe',
-            email: 'john@example.com'
-          },
-          appointments: [
-            {
-              reason: 'General Checkup',
-              doctor: { user: { name: 'Smith' } },
-              date: new Date('2025-10-10'),
-              consultationFee: 150
-            },
-            {
-              reason: 'Follow-up Consultation',
-              doctor: { user: { name: 'Johnson' } },
-              date: new Date('2025-10-12'),
-              consultationFee: 100
-            }
-          ],
-          totalAmount: 250,
-          paidAmount: 250,
-          paymentMethod: 'card',
-          status: 'paid'
-        }
-      ];
-      setPayments(mockPayments);
-      setLoading(false);
-    }, 1000);
+    fetchPaymentHistory();
   }, []);
+
+  const fetchPaymentHistory = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login first');
+        navigate('/login');
+        return;
+      }
+
+      const response = await axios.get(`${API_URL}/bills/history`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (response.data.success) {
+        setPayments(response.data.bills);
+      }
+    } catch (error) {
+      console.error('Error fetching payment history:', error);
+      if (error.response?.status === 401) {
+        alert('Session expired. Please login again.');
+        navigate('/login');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const downloadReceipt = (payment) => {
     const receiptWindow = window.open('', '_blank');
@@ -55,25 +53,37 @@ const PaymentHistory = () => {
   };
 
   const generateReceiptHTML = (payment) => {
-    const date = new Date(payment.paidAt);
+    const date = new Date(payment.paidAt || payment.createdAt);
     const formattedDate = date.toLocaleDateString('en-US', { 
       year: 'numeric', 
       month: 'long', 
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      hour12: true
     });
 
     const appointments = payment.appointments || [];
     
-    const itemsRows = appointments.map(apt => `
+    const itemsRows = appointments.map(apt => {
+      // Handle multiple possible date field names
+      const aptDate = apt.start || apt.date || apt.appointmentDate || apt.createdAt;
+      const dateObj = new Date(aptDate);
+      const formattedAptDate = dateObj.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+      
+      return `
       <tr>
         <td>${apt.reason || 'Medical Consultation'}</td>
         <td>Dr. ${apt.doctor?.user?.name || 'Unknown'}</td>
-        <td>${new Date(apt.date).toLocaleDateString()}</td>
-        <td style="text-align: right;">$${(apt.consultationFee || 100).toFixed(2)}</td>
+        <td>${formattedAptDate}</td>
+        <td style="text-align: right;">$${(apt.doctor?.fees || 100).toFixed(2)}</td>
       </tr>
-    `).join('');
+      `;
+    }).join('');
     
     return `<!DOCTYPE html>
 <html>
@@ -324,7 +334,7 @@ const PaymentHistory = () => {
       {/* Header */}
       <div className="bg-white shadow-md sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
-          <button onClick={() => window.history.back()} className="text-teal-600 hover:text-teal-700 transition-colors">
+          <button onClick={() => navigate(-1)} className="text-teal-600 hover:text-teal-700 transition-colors">
             <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
             </svg>
@@ -378,53 +388,61 @@ const PaymentHistory = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {filteredPayments.map((payment) => (
-                    <tr key={payment._id} className="hover:bg-teal-50/50 transition-colors">
-                      <td className="px-6 py-4">
-                        <span className="font-mono text-sm font-semibold text-gray-800">
-                          #{payment._id?.slice(-8).toUpperCase()}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-gray-700">
-                        {new Date(payment.paidAt).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric'
-                        })}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="text-gray-700 font-medium">
-                          {payment.appointments?.length || 0} appointment(s)
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
-                          {payment.paymentMethod?.toUpperCase() || 'CARD'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="text-lg font-bold text-teal-600">
-                          ${(payment.paidAmount || 0).toFixed(2)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800">
-                          ✓ Paid
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <button
-                          onClick={() => downloadReceipt(payment)}
-                          className="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all font-semibold shadow-md hover:shadow-lg transform hover:scale-105"
-                        >
-                          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                          Download
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {filteredPayments.map((payment) => {
+                    const paymentDate = new Date(payment.paidAt || payment.createdAt);
+                    const formattedPaymentDate = paymentDate.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true
+                    });
+                    
+                    return (
+                      <tr key={payment._id} className="hover:bg-teal-50/50 transition-colors">
+                        <td className="px-6 py-4">
+                          <span className="font-mono text-sm font-semibold text-gray-800">
+                            #{payment._id?.slice(-8).toUpperCase()}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-gray-700">
+                          {formattedPaymentDate}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-gray-700 font-medium">
+                            {payment.appointments?.length || 0} appointment(s)
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
+                            {payment.paymentMethod?.toUpperCase() || 'CARD'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-lg font-bold text-teal-600">
+                            ${(payment.paidAmount || 0).toFixed(2)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800">
+                            ✓ Paid
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <button
+                            onClick={() => downloadReceipt(payment)}
+                            className="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all font-semibold shadow-md hover:shadow-lg transform hover:scale-105"
+                          >
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Download
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
