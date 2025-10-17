@@ -19,16 +19,42 @@ export const getOutstandingBills = async (patientId) => {
   // Group and calculate bills
   const bills = await Promise.all(
     appointments.map(async (appointment) => {
-      const doctor = await Doctor.findById(appointment.doctor);
-      console.log('Doctor fees:', doctor?.fees); // Debug log
+      // Get doctor details
+      let doctorName = 'Unknown Doctor';
+      let doctorSpecialization = 'General';
+      let doctorFees = 0;
+
+      if (appointment.doctor) {
+        // Doctor is already populated, check if it has user
+        if (appointment.doctor.user) {
+          doctorName = appointment.doctor.user.name || 'Unknown Doctor';
+        } else {
+          // If user not populated, fetch doctor again
+          const doctor = await Doctor.findById(appointment.doctor._id || appointment.doctor).populate('user', 'name email');
+          doctorName = doctor?.user?.name || 'Unknown Doctor';
+          doctorSpecialization = doctor?.specializations?.[0] || 'General';
+          doctorFees = doctor?.fees || 0;
+        }
+        
+        // Get specialization and fees
+        if (appointment.doctor.specializations) {
+          doctorSpecialization = appointment.doctor.specializations[0] || 'General';
+        }
+        if (appointment.doctor.fees !== undefined) {
+          doctorFees = appointment.doctor.fees;
+        }
+      }
+
+      console.log('Doctor name:', doctorName, 'Fees:', doctorFees); // Debug log
+
       return {
         appointmentId: appointment._id,
         patientId: appointment.patient,
-        doctorName: doctor?.user?.name || 'Unknown Doctor',
-        doctorSpecialization: doctor?.specializations?.[0] || 'General',
+        doctorName: doctorName,
+        doctorSpecialization: doctorSpecialization,
         appointmentDate: appointment.start,
         reason: appointment.reason || 'Consultation',
-        amount: doctor?.fees || 0,
+        amount: doctorFees,
         status: appointment.paymentStatus,
         appointmentStatus: appointment.status
       };
@@ -37,7 +63,7 @@ export const getOutstandingBills = async (patientId) => {
 
   const totalAmount = bills.reduce((sum, bill) => sum + bill.amount, 0);
 
-  console.log('Bills generated:', bills); // Debug log
+  console.log('Bills generated:', bills.length); // Debug log
   console.log('Total amount:', totalAmount); // Debug log
 
   return {
