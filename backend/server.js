@@ -13,6 +13,8 @@ import stripeRoutes from "./routes/stripeRoutes.js";
 import feedbackRoutes from "./routes/feedbackRoutes.js";
 import communityRoutes from "./routes/communityRoutes.js";
 
+import healthRecordRoutes from "./routes/healthRecordRoutes.js";
+
 
 
 //app config
@@ -36,6 +38,7 @@ app.use("/api/bills", billRoutes);
 app.use("/api/stripe", stripeRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/community", communityRoutes);
+app.use("/api/health-records", healthRecordRoutes);
 
 
 

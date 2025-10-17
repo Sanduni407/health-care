@@ -29,6 +29,7 @@ import MyPosts from './pages/Community/MyPosts';
 import DoctorSchedule from './pages/Doctor/DoctorSchedule';
 import PaymentHistory from './pages/billPayment/PaymentHistory';
 
+import HealthRecords from "./pages/HealthRecords/HealthRecords";
 
 
 const App = () => {
@@ -166,7 +167,11 @@ const App = () => {
 
 
    <Route path="/doctor/schedule" element={<DoctorSchedule />} />
-
+     <Route path="/health-records" element={
+  <ProtectedRoute allowedRoles={['patient']}>
+    <HealthRecords />
+  </ProtectedRoute>
+} />
       </Routes>
     </div>
   )
