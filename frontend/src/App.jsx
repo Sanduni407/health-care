@@ -27,6 +27,7 @@ import CreatePost from './pages/Community/CreatePost';
 import EditPost from './pages/Community/EditPost';
 import MyPosts from './pages/Community/MyPosts';
 import DoctorSchedule from './pages/Doctor/DoctorSchedule';
+import PaymentHistory from './pages/billPayment/PaymentHistory';
 
 
 
@@ -111,6 +112,7 @@ const App = () => {
         <Route path="/outstanding-bills" element={<OutstandingBills />} />
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/payment-history" element={<PaymentHistory />} />
 
          {/* Feedback Routes */}
 <Route path="/send-feedback" element={
