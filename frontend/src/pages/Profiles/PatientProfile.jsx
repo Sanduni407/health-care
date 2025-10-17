@@ -166,6 +166,7 @@ export default function PatientProfile() {
               <ArrowRight className="w-6 h-6 text-teal-600 group-hover:translate-x-1 transition-transform" />
             </div>
           </button>
+          
 
           <button
   onClick={() => navigate("/send-feedback")}
@@ -183,7 +184,24 @@ export default function PatientProfile() {
     <ArrowRight className="w-6 h-6 text-teal-600 group-hover:translate-x-1 transition-transform" />
   </div>
 </button>
+   {/* manage records button */}   
 
+          <button
+  onClick={() => navigate("/health-records")}
+  className="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-all border border-gray-100 hover:border-teal-500 text-left group"
+>
+  <div className="flex items-center justify-between">
+    <div>
+      <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-teal-600 transition-colors">
+        Health Records
+      </h3>
+      <p className="text-gray-600">
+        View, upload and analyze your medical records
+      </p>
+    </div>
+    <ArrowRight className="w-6 h-6 text-teal-600 group-hover:translate-x-1 transition-transform" />
+  </div>
+</button> 
 <button
   onClick={() => navigate("/urgent-responses")}
   className="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-all border border-gray-100 hover:border-red-500 text-left group"
