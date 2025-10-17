@@ -18,6 +18,16 @@ import OutstandingBills from './pages/billPayment/OutstandingBills';
 import PaymentPage from './pages/billPayment/PaymentPage';
 import PaymentSuccess from './pages/billPayment/PaymentSuccess';
 
+import SendFeedback from './pages/Feedback/SendFeedback';
+import DoctorFeedbacks from './pages/Feedback/DoctorFeedbacks';
+import UrgentResponses from './pages/Feedback/UrgentResponses';
+import FlaggedConcerns from './pages/Feedback/FlaggedConcerns';
+import CommunityFeed from './pages/Community/CommunityFeed';
+import CreatePost from './pages/Community/CreatePost';
+import EditPost from './pages/Community/EditPost';
+import MyPosts from './pages/Community/MyPosts';
+
+
 
 const App = () => {
   return (
@@ -100,6 +110,56 @@ const App = () => {
         <Route path="/outstanding-bills" element={<OutstandingBills />} />
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
+
+         {/* Feedback Routes */}
+<Route path="/send-feedback" element={
+  <ProtectedRoute allowedRoles={['patient']}>
+    <SendFeedback />
+  </ProtectedRoute>
+} />
+
+<Route path="/doctor/feedbacks" element={
+  <ProtectedRoute allowedRoles={['doctor']}>
+    <DoctorFeedbacks />
+  </ProtectedRoute>
+} />
+
+<Route path="/urgent-responses" element={
+  <ProtectedRoute allowedRoles={['patient']}>
+    <UrgentResponses />
+  </ProtectedRoute>
+} />
+
+<Route path="/admin/flagged-concerns" element={
+  <ProtectedRoute allowedRoles={['admin']}>
+    <FlaggedConcerns />
+  </ProtectedRoute>
+} />
+
+{/* Community Routes */}
+<Route path="/community" element={
+  <ProtectedRoute allowedRoles={['patient', 'doctor', 'admin']}>
+    <CommunityFeed />
+  </ProtectedRoute>
+} />
+
+<Route path="/create-post" element={
+  <ProtectedRoute allowedRoles={['doctor']}>
+    <CreatePost />
+  </ProtectedRoute>
+} />
+
+<Route path="/edit-post/:id" element={
+  <ProtectedRoute allowedRoles={['doctor']}>
+    <EditPost />
+  </ProtectedRoute>
+} />
+
+<Route path="/my-posts" element={
+  <ProtectedRoute allowedRoles={['doctor']}>
+    <MyPosts />
+  </ProtectedRoute>
+} />
       </Routes>
     </div>
   )

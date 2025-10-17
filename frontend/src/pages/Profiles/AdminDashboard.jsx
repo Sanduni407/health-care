@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../../components/Card/Card';
-import { Users, Crown } from 'lucide-react';
+import { Users, Crown, Flag } from 'lucide-react';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -42,6 +42,12 @@ const AdminDashboard = () => {
             icon={Users}
             onClick={() => navigate('/admin/manage-users')}
           />
+
+           <Card
+  title="Flagged Concerns"
+  icon={Flag}
+  onClick={() => navigate('/admin/flagged-concerns')}
+/>
         </div>
       </div>
     </div>

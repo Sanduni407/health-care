@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Bell, X, Check, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import {
   getMyNotifications,
   getUnreadCount,
@@ -9,6 +10,7 @@ import {
 } from "../api/notificationApi";
 
 export default function NotificationBell() {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -65,6 +67,23 @@ export default function NotificationBell() {
     }
   };
 
+  const handleNotificationClick = async (notification) => {
+    // Mark as read
+    await markNotificationRead(notification._id);
+    
+    // Navigate based on type
+    if (notification.type === "urgent_response") {
+      navigate("/patient-profile");
+    } else if (notification.type === "concern_flagged") {
+      navigate("/admin-dashboard");
+    } else if (notification.appointmentId) {
+      navigate("/my-appointments");
+    }
+    
+    setIsOpen(false);
+    fetchNotifications();
+  };
+
   const getNotificationIcon = (type) => {
     switch (type) {
       case "appointment_cancelled":
@@ -73,6 +92,10 @@ export default function NotificationBell() {
         return "✅";
       case "appointment_reminder":
         return "⏰";
+      case "urgent_response":
+        return "💬";
+      case "concern_flagged":
+        return "🚩";
       default:
         return "📢";
     }
@@ -160,7 +183,8 @@ export default function NotificationBell() {
                   {notifications.map((notif) => (
                     <div
                       key={notif._id}
-                      className={`p-4 hover:bg-gray-50 transition-colors ${
+                      onClick={() => handleNotificationClick(notif)}
+                      className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer ${
                         !notif.isRead ? "bg-teal-50" : ""
                       }`}
                     >
@@ -187,7 +211,10 @@ export default function NotificationBell() {
                         <div className="flex items-center space-x-1 flex-shrink-0">
                           {!notif.isRead && (
                             <button
-                              onClick={() => handleMarkAsRead(notif._id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMarkAsRead(notif._id);
+                              }}
                               className="p-1 text-teal-600 hover:bg-teal-100 rounded transition-colors"
                               title="Mark as read"
                             >
@@ -195,7 +222,10 @@ export default function NotificationBell() {
                             </button>
                           )}
                           <button
-                            onClick={() => handleDelete(notif._id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(notif._id);
+                            }}
                             className="p-1 text-red-500 hover:bg-red-50 rounded transition-colors"
                             title="Delete"
                           >

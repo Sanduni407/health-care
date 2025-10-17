@@ -10,6 +10,10 @@ import availabilityRoutes from "./routes/availabilityRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import billRoutes from "./routes/billRoutes.js";
 import stripeRoutes from "./routes/stripeRoutes.js";
+import feedbackRoutes from "./routes/feedbackRoutes.js";
+import communityRoutes from "./routes/communityRoutes.js";
+
+
 
 //app config
 const app = express()
@@ -30,6 +34,10 @@ app.use("/api/availability", availabilityRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/bills", billRoutes);
 app.use("/api/stripe", stripeRoutes);
+app.use("/api/feedback", feedbackRoutes);
+app.use("/api/community", communityRoutes);
+
+
 
 app.use("/uploads", express.static("uploads"));
 

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import { UserCircle, LogOut, User, Calendar } from "lucide-react";
+import { UserCircle, LogOut, User, Calendar, Users } from "lucide-react";
 import NotificationBell from "../NotificationBell";
 
 export default function Navbar() {
@@ -53,6 +53,15 @@ export default function Navbar() {
               </>
             ) : (
               <>
+                {/* Community Button */}
+                <Link
+                  to="/community"
+                  className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-teal-600 transition-colors rounded-md hover:bg-gray-50"
+                >
+                  <Users className="w-5 h-5" />
+                  <span className="font-medium">Community</span>
+                </Link>
+
                 {/* Make Appointment Button */}
                 {user.role !== "admin" && (
                   <Link

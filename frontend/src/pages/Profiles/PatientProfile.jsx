@@ -168,6 +168,41 @@ export default function PatientProfile() {
           </button>
 
           <button
+  onClick={() => navigate("/send-feedback")}
+  className="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-all border border-gray-100 hover:border-teal-500 text-left group"
+>
+  <div className="flex items-center justify-between">
+    <div>
+      <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-teal-600 transition-colors">
+        Send Feedback
+      </h3>
+      <p className="text-gray-600">
+        Share your experience with doctors
+      </p>
+    </div>
+    <ArrowRight className="w-6 h-6 text-teal-600 group-hover:translate-x-1 transition-transform" />
+  </div>
+</button>
+
+<button
+  onClick={() => navigate("/urgent-responses")}
+  className="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-all border border-gray-100 hover:border-red-500 text-left group"
+>
+  <div className="flex items-center justify-between">
+    <div>
+      <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-red-600 transition-colors">
+        Urgent Responses
+      </h3>
+      <p className="text-gray-600">
+        View replies from doctors
+      </p>
+    </div>
+    <ArrowRight className="w-6 h-6 text-red-600 group-hover:translate-x-1 transition-transform" />
+  </div>
+</button>
+
+
+          <button
             onClick={() => navigate("/my-appointments")}
             className="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-all border border-gray-100 hover:border-teal-500 text-left group"
           >
