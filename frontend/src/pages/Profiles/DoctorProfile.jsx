@@ -133,6 +133,13 @@ export default function DoctorProfile() {
               <Calendar className="w-5 h-5"/> Manage Availability
             </button>
 
+            <button
+              onClick={() => navigate("/doctor/schedule")}
+             className="bg-white text-teal-600 px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-100"
+            >
+        <Calendar className="w-5 h-5"/> View Schedule
+      </button>
+
  <button
   onClick={() => navigate("/doctor/feedbacks")}
   className="bg-white text-teal-600 px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-100"
@@ -330,6 +337,8 @@ export default function DoctorProfile() {
           </div>
         </div>
       )}
+
+
     </div>
   );
 }
