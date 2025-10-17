@@ -1,6 +1,7 @@
 import * as billRepo from "../repositories/billRepository.js";
 import Appointment from "../models/appointmentModel.js";
 import Doctor from "../models/doctorModel.js";
+import Bill from "../models/billModel.js";
 
 // Get outstanding bills for a patient (auto-generated from unpaid appointments)
 export const getOutstandingBills = async (patientId) => {
@@ -147,4 +148,19 @@ export const cancelBill = async (billId) => {
 // Get all bills (admin)
 export const getAllBills = async () => {
   return billRepo.getAllBills();
+};
+
+export const getBillsByPatient = (patientId, status = null) => {
+  const filter = { patient: patientId };
+  if (status) filter.status = status;
+  return Bill.find(filter)
+    .populate('patient', 'name email phone')
+    .populate({
+      path: 'appointments',
+      populate: {
+        path: 'doctor',
+        populate: { path: 'user', select: 'name email' }
+      }
+    })
+    .sort({ createdAt: -1 });
 };
