@@ -160,12 +160,6 @@ export default function DoctorProfile() {
               <Edit className="w-5 h-5"/> {profile ? "Edit Profile" : "Create Profile"}
             </button>
 
-            <button
-              className="bg-white text-teal-600 px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-100"
-              onClick={() => setEditing(true)}
-            >
-              <Edit className="w-5 h-5"/> {profile ? "Edit Profile" : "Create Profile"}
-            </button>
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import * as appointmentRepo from "../repositories/appointmentRepository.js";
 import * as slotRepo from "../repositories/slotRepository.js";
 import * as notificationRepo from "../repositories/notificationRepository.js";
+import Doctor from "../models/doctorModel.js";
 
 export const bookAppointment = async ({ patientId, slotId, reason, phone }) => {
   // Step 1: Check if slot exists and is available
@@ -80,6 +81,16 @@ export const cancelAppointment = async (appointmentId) => {
     // Free up the slot
     await slotRepo.markSlotAvailable(appointment.slot);
 
+
+    const appointmentDate = new Date(appointment.start).toLocaleString('en-US', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
     // Create cancellation notification for patient
     try {
       await notificationRepo.createNotification({
@@ -89,7 +100,27 @@ export const cancelAppointment = async (appointmentId) => {
         message: `Your appointment on ${new Date(appointment.start).toLocaleString()} has been cancelled.`,
         appointmentId: appointment._id
       });
+
+      //create a cancellation notification for the doctor
+
+      const doctorProfile = await Doctor.findById(appointment.doctor).populate('user');
+
+      if (doctorProfile && doctorProfile.user) {
+        await notificationRepo.createNotification({
+          user: doctorProfile.user._id,
+          type: 'appointment_cancelled',
+          title: '🔔 Appointment Cancelled by Patient',
+          message: `An appointment scheduled for ${appointmentDate} has been cancelled by the patient.`,
+          appointmentId: appointment._id
+        });
+        console.log(`✅ Cancellation notification created for doctor ${doctorProfile.user._id}`);
+      }
+
+
       console.log(`✅ Cancellation notification created for patient ${appointment.patient}`);
+
+
+
     } catch (notifErr) {
       console.error('❌ Failed to create cancellation notification:', notifErr.message);
     }
