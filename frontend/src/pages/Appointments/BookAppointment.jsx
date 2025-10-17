@@ -71,50 +71,62 @@ export default function BookAppointment() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!selectedSlot) {
-      setError("Please select a time slot");
-      return;
-    }
+  e.preventDefault();
 
-    setLoading(true);
-    setError(null);
-    setShowError(false);
+  if (!selectedSlot) {
+    setError("Please select a time slot");
+    return;
+  }
 
-    try {
-      const res = await bookAppointment({
-        slotId: selectedSlot._id,
-        reason: form.reason,
-        phone: form.phone,
-      });
+  // ✅ Added validation for 10-digit phone and required reason
+  if (!/^\d{10}$/.test(form.phone)) {
+    setError("Please enter a valid 10-digit mobile number");
+    return;
+  }
 
-      if (res.success) {
-        setShowSuccess(true);
-        setTimeout(() => {
-          navigate("/my-appointments");
-        }, 3000);
-      } else {
-        // Booking failed - show error modal
-        setError(res.message);
-        setErrorDetails({
-          selectedSlot: selectedSlot,
-          attemptedDate: selectedDate,
-          doctorName: doctor?.user?.name
-        });
-        setShowError(true);
-        setLoading(false);
-      }
-    } catch (err) {
-      setError(err.message || "Failed to book appointment");
+  if (!form.reason.trim()) {
+    setError("Please enter a reason for your appointment");
+    return;
+  }
+
+  setLoading(true);
+  setError(null);
+  setShowError(false);
+
+  try {
+    const res = await bookAppointment({
+      slotId: selectedSlot._id,
+      reason: form.reason,
+      phone: form.phone,
+    });
+
+    if (res.success) {
+      setShowSuccess(true);
+      setTimeout(() => {
+        navigate("/my-appointments");
+      }, 3000);
+    } else {
+      setError(res.message);
       setErrorDetails({
         selectedSlot: selectedSlot,
         attemptedDate: selectedDate,
-        doctorName: doctor?.user?.name
+        doctorName: doctor?.user?.name,
       });
       setShowError(true);
       setLoading(false);
     }
-  };
+  } catch (err) {
+    setError(err.message || "Failed to book appointment");
+    setErrorDetails({
+      selectedSlot: selectedSlot,
+      attemptedDate: selectedDate,
+      doctorName: doctor?.user?.name,
+    });
+    setShowError(true);
+    setLoading(false);
+  }
+};
+
 
   const handleTryAgain = () => {
     setShowError(false);
