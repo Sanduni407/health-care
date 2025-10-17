@@ -32,14 +32,46 @@ export const notifyAffectedPatients = async (doctorId, date) => {
   const appointments = await Appointment.find({
     doctor: doctorId,
     start: { $gte: startOfDay, $lte: endOfDay },
-    status: 'cancelled'  //this has as booked
+    status: 'booked'
   }).populate('patient');
 
   // Create notifications for each affected patient
   for (const appointment of appointments) {
     await createAppointmentCancelledNotification(appointment, "doctor marked this date as unavailable");
-    //await appointmentRepo.cancelAppointment(appointment._id);
+    await appointmentRepo.cancelAppointment(appointment._id);
   }
 
   return appointments.length;
+};
+
+// ========== NEW FEEDBACK NOTIFICATION FUNCTIONS ==========
+
+// Notify patient when doctor sends urgent response
+export const createUrgentResponseNotification = async (urgentResponse, feedbackTitle, doctorName) => {
+  await notificationRepo.createNotification({
+    user: urgentResponse.patient,
+    type: 'urgent_response',
+    title: '💬 Urgent Response Received',
+    message: `Dr. ${doctorName} has responded to your urgent feedback: "${feedbackTitle}"`,
+    feedbackId: urgentResponse.feedback,
+    urgentResponseId: urgentResponse._id
+  });
+};
+
+// Notify admin when doctor flags a concern
+export const createConcernFlaggedNotification = async (flaggedConcern, feedbackTitle, doctorName, patientName) => {
+  // Get all admin users
+  const admins = await notificationRepo.getAllAdminUsers();
+  
+  // Create notification for each admin
+  for (const admin of admins) {
+    await notificationRepo.createNotification({
+      user: admin._id,
+      type: 'concern_flagged',
+      title: '🚩 New Concern Flagged',
+      message: `Dr. ${doctorName} flagged a concern from patient ${patientName}: "${feedbackTitle}"`,
+      feedbackId: flaggedConcern.feedback,
+      flaggedConcernId: flaggedConcern._id
+    });
+  }
 };

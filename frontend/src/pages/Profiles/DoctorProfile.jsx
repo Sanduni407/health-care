@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { Stethoscope, Edit, Calendar } from "lucide-react";
+import { Stethoscope, Edit, Calendar, MessageSquare, FileText } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
 import { getDoctorProfile, updateDoctorProfile, uploadDoctorImage } from "../../api/doctorApi";
 import Navbar from "../../components/Navbar/Navbar";
@@ -132,6 +132,34 @@ export default function DoctorProfile() {
             >
               <Calendar className="w-5 h-5"/> Manage Availability
             </button>
+
+ <button
+  onClick={() => navigate("/doctor/feedbacks")}
+  className="bg-white text-teal-600 px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-100"
+>
+  <MessageSquare className="w-5 h-5"/> View Feedbacks
+</button>
+
+ <button
+  onClick={() => navigate("/create-post")}
+  className="bg-white text-teal-600 px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-100"
+>
+  <FileText className="w-5 h-5"/> Create Post
+</button>
+
+<button
+  onClick={() => navigate("/my-posts")}
+  className="bg-white text-teal-600 px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-100"
+>
+  <FileText className="w-5 h-5"/> My Posts
+</button>
+            <button
+              className="bg-white text-teal-600 px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-100"
+              onClick={() => setEditing(true)}
+            >
+              <Edit className="w-5 h-5"/> {profile ? "Edit Profile" : "Create Profile"}
+            </button>
+
             <button
               className="bg-white text-teal-600 px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-100"
               onClick={() => setEditing(true)}
