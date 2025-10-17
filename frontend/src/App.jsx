@@ -26,6 +26,7 @@ import CommunityFeed from './pages/Community/CommunityFeed';
 import CreatePost from './pages/Community/CreatePost';
 import EditPost from './pages/Community/EditPost';
 import MyPosts from './pages/Community/MyPosts';
+import DoctorSchedule from './pages/Doctor/DoctorSchedule';
 
 
 
@@ -160,6 +161,10 @@ const App = () => {
     <MyPosts />
   </ProtectedRoute>
 } />
+
+
+   <Route path="/doctor/schedule" element={<DoctorSchedule />} />
+
       </Routes>
     </div>
   )
