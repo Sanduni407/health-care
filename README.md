@@ -46,25 +46,3 @@ health-care/
 ├── tests/
 ├── README.md
 └── package.json
-
-
----
-
-## 🏥 Domain-Specific Contribution Rules
-
-- Ensure accuracy in healthcare-related logic
-- Do not expose patient or medical data
-- Follow ethical healthcare software practices
-- Validate all medical and user inputs
-- Maintain data integrity at all times
-
----
-
-## 🔑 Environment Configuration
-
-Create a `.env` file before running the project:
-
-```env
-PORT=5000
-DATABASE_URL=your_database_connection
-JWT_SECRET=your_secret_key
